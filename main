@@ -30,7 +30,7 @@ NUMBER_IMAGE_6 = pygame.image.load(os.path.join('Assets', 'Numbers_6.png'))
 NUMBER_IMAGE_7 = pygame.image.load(os.path.join('Assets', 'Numbers_7.png'))
 NUMBER_IMAGE_8 = pygame.image.load(os.path.join('Assets', 'Numbers_8.png'))
 NUMBER_IMAGE_9 = pygame.image.load(os.path.join('Assets', 'Numbers_9.png'))
-new_game=True
+
 NUMBER_IMAGE_0 = pygame.transform.scale(NUMBER_IMAGE_0, (NUMBER_WIDTH, NUMBER_HEIGHT))
 NUMBER_IMAGE_1 = pygame.transform.scale(NUMBER_IMAGE_1, (NUMBER_WIDTH, NUMBER_HEIGHT))
 NUMBER_IMAGE_2 = pygame.transform.scale(NUMBER_IMAGE_2, (NUMBER_WIDTH, NUMBER_HEIGHT))
@@ -52,6 +52,7 @@ level = False
 rand = True
 level_dict={}
 level_n=0
+goal=0
 collision=['']
 num_list=['']
 pygame.mouse.set_visible(1)
@@ -202,15 +203,28 @@ def numbers(number):
 
 def set_random():
     import random
+    global goal
     number = random.randint(1000, 10000000)
+    if number%5==0:
+        goal=5
+    else:
+        goal=1
     numbers(number)
 def set_level(num):
     global level_dict
-
+    global goal
     number = level_dict.get(num)
+    if number%5==0:
+        goal=5
+    else:
+        goal=1
     numbers(number)
+def set_number(number):
+    numbers(number)
+
 def popdict():
     num=len(num_list)
+    global col_dict
     for i in range(num):
         col_dict[i] = False
 
@@ -223,7 +237,8 @@ def game():
     run = True
     global col_dict
     select = []
-
+    global goal
+    global num
     while run:
         WIN.blit(bg, (0, 0))
         clock.tick(FPS)
@@ -270,12 +285,12 @@ def game():
                                 j=i+1
                                 if h in select and j in select:
                                     select.clear()
-                                    popdict()
+                                    #popdict()
 
 
 
                     select.sort()
-                    print(select)
+                    
                     num=''
                     for i in select:
                         num+=str(num_list[i])
@@ -284,23 +299,126 @@ def game():
 
                         select_font_text = SELECT_FONT.render('you have selected: '+ num,1,WHITE)
                         WIN.blit(select_font_text, (10, 10))
+
                         if number % 2 == 0:
                             DIVIDE = pygame.image.load(os.path.join('Assets', 'Numbers_D.png'))
                             MUL = pygame.image.load(os.path.join('Assets', 'Numbers_X.png'))
                             DIVIDE=pygame.transform.scale(DIVIDE, (35, 35))
                             MUL=pygame.transform.scale(MUL, (35, 35))
-                            MUL_RECT=pygame.Rect(450,15 , 20, 20)
-                            DIV_RECT= pygame.Rect(475,15 , 20, 20)
+                            MUL_RECT=pygame.Rect(485,15 , 20, 20)
+                            DIV_RECT= pygame.Rect(520,15 , 20, 20)
                             WIN.blit(DIVIDE,(DIV_RECT.x,DIV_RECT.y))
                             WIN.blit(MUL,(MUL_RECT.x,MUL_RECT.y))
+                            passed=False
 
-                        else:
+                            if MUL_RECT.collidepoint(pygame.mouse.get_pos()) and pygame.mouse.get_pressed()[0]:
+                                n = ""
+                                n1 = 0
+                                n2 = ""
+                                n3 = 0
+                                for i in col_dict:
+                                    if col_dict.get(i) == True:
+                                        select.append(i)
+                                select = list(set(select))
+
+                                for i in col_dict.keys():
+                                    if i in select:
+                                        n2 += str(num_list[i])
+                                    while n2 != '':
+
+                                        n3 = int(n2) * 2
+                                        if n2 != '':
+                                            break
+                                for i in range(len(num_list)):
+                                    if i not in select:
+                                        n += str(num_list[i])
+                                    elif i in select and passed == False:
+                                        n += str(n3)
+                                        passed = True
+                                n1 = int(n)
+                                print(n1)
+                                draw_window()
+                                set_number(n1)
+                                popdict()
+                                num = ''
+                            elif DIV_RECT.collidepoint(pygame.mouse.get_pos()) and pygame.mouse.get_pressed()[0]:
+                                n = ""
+                                n1 = 0
+                                n2 = ""
+                                n3 = 0
+                                for i in col_dict:
+                                    if col_dict.get(i) == True:
+                                        select.append(i)
+                                select = list(set(select))
+
+                                for i in col_dict.keys():
+                                    if i in select:
+                                        n2 += str(num_list[i])
+                                    while n2 != '':
+
+                                        n3 = int(int(n2) /2)
+                                        if n2 != '':
+                                            break
+                                for i in range(len(num_list)):
+                                    if i not in select:
+                                        n += str(num_list[i])
+                                    elif i in select and passed == False:
+                                        n += str(n3)
+                                        passed = True
+                                n1 = int(n)
+                                print(n1)
+                                draw_window()
+                                set_number(n1)
+                                popdict()
+                                num = ''
+                                print(num)
+                        elif number % 2 > 0:
                             MUL = pygame.image.load(os.path.join('Assets', 'Numbers_X.png'))
                             MUL = pygame.transform.scale(MUL, (35, 35))
-                            MUL_RECT = pygame.Rect(455, 15, 20, 20)
+                            MUL_RECT = pygame.Rect(485, 15, 20, 20)
                             WIN.blit(MUL, (MUL_RECT.x, MUL_RECT.y))
-                        print(col_dict)
+                            passed= False
+                            if MUL_RECT.collidepoint(pygame.mouse.get_pos()) and pygame.mouse.get_pressed()[0]:
+                                n = ""
+                                n1 = 0
+                                n2 = ""
+                                n3 = 0
+                                for i in col_dict:
+                                    if col_dict.get(i) == True:
+                                        select.append(i)
+                                select = list(set(select))
+
+                                for i in col_dict.keys():
+                                    if i in select:
+                                        n2 += str(num_list[i])
+                                    while n2 != '':
+
+                                        n3 = int(n2) * 2
+                                        if n2 != '':
+                                            break
+                                for i in range(len(num_list)):
+                                    if i not in select:
+                                        n += str(num_list[i])
+                                    elif i in select and passed == False:
+                                        n += str(n3)
+                                        passed = True
+                                n1 = int(n)
+                                print(n1)
+                                draw_window()
+                                set_number(n1)
+                                popdict()
+                                select.clear()
+
                         pygame.display.update()
+
+
+
+
+
+
+
+
+
 
 
 
@@ -310,44 +428,45 @@ def game():
 def main():
     draw_window()
 
-    menu=True
-    num=False
+    menu = True
+    num_mode = False
     global rand
-    rand=False
-    run=True
+    rand = False
+    run = True
     while run:
-        for option in options:
-            if option.rect.collidepoint(pygame.mouse.get_pos()):
-                option.hovered = True
-            else:
-                option.hovered = False
-            option.draw()
-        pygame.display.update()
         while menu:
-            if (options[0].rect.collidepoint(pygame.mouse.get_pos()) and pygame.mouse.get_pressed()[0])==True:
-                num=True
-                menu=False
-                run=False
-            elif (options[1].rect.collidepoint(pygame.mouse.get_pos()) and pygame.mouse.get_pressed()[0])==True:
-                rand=True
-                menu=False
-                run=False
+            for option in options:
+                if option.rect.collidepoint(pygame.mouse.get_pos()):
+                    option.hovered = True
+                else:
+                    option.hovered = False
+                option.draw()
+            pygame.display.update()
+            if (options[0].rect.collidepoint(pygame.mouse.get_pos()) and pygame.mouse.get_pressed()[0]) == True:
+                num_mode = True
+                menu = False
+                run = False
+            elif (options[1].rect.collidepoint(pygame.mouse.get_pos()) and pygame.mouse.get_pressed()[0]) == True:
+                rand = True
+                menu = False
+                run = False
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
 
         if rand:
+            draw_window()
             set_random()
-            rand=False
-        if num:
-            pass
+            rand = False
+        if num_mode:
+            draw_window()
 
     popdict()
     pygame.display.update()
     game()
+
 
 if __name__ == "__main__":
     main()
